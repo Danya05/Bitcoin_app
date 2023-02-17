@@ -1,21 +1,33 @@
 import copy
-
+from database import crud
 import fastapi
-from fastapi import Request
+from fastapi import FastAPI, Query, Body
 import database
 import pydantic_models
 import config
 
-api = fastapi.FastAPI()
+api = FastAPI()
+
+
+@api.get('/user/{user_id}')
+def get_users(user_id: str, query: str | None = None):
+    if query:
+        return {"item_id": user_id, "query": query}
+    return {"item_id": user_id}
+
 
 '''
+
+<<<LEARNING>>>
+<<<WITHOUT Pony.orm>>>
+
 @api.get('/')
 @api.post('/')
 @api.put('/')
 @api.delete('/')
 def index(request: Request):
     return {"Request": [request.method, request.headers]}
-'''
+
 
 
 fake_database = {'users':[
@@ -86,3 +98,5 @@ def get_total_balance():
 @api.get("/users/")
 def get_users(skip: int = 0, limit: int = 10):
     return fake_database['users'][skip: skip + limit]
+
+'''
