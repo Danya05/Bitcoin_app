@@ -16,6 +16,71 @@ def get_users(user_id: str, query: str | None = None):
     return {"item_id": user_id}
 
 
+@api.put('/user/{user_id}')
+def update_user(user_id: int, user: pydantic_models.UserToUpdate = fastapi.Body()):
+    return crud.update_user(user).to_dict()
+
+
+@api.delete('/user/{user_id}')
+@crud.db_session
+def delete_user(user_id: int = fastapi.Path()):
+    crud.get_user_by_id(user_id).delete()
+    return True
+
+
+@api.post('/user/create')
+def create_user(user: pydantic_models.UserToCreate):
+    return crud.create_user(tg_id=user.tg_ID, nick=user.nick if user.nick else None).to_dict()
+
+
+@api.get('/get_info_by_user_id/{user_id}')
+@crud.db_session
+def get_user_info(user_id: int):
+    return crud.get_user_info(crud.User[user_id])
+
+
+@api.get('/get_user_balance_by_id/{user_id}')
+@crud.db_session
+def get_user_balance_by_id(user_id: int):
+    return crud.User[user_id].wallet.balance
+
+
+@api.get('/get_total_balance')
+@crud.db_session
+def get_total_balance():
+    balance = 0.0
+    crud.update_all_wallets()
+    for user in crud.User.select()[:]:
+        balance += user.wallet.balance
+    return balance
+
+
+@api.get('/users/')
+@crud.db_session
+def get_users():
+    users = []
+    for user in crud.User.select()[:]:
+        users.append(user.to_dict())
+    return users
+
+
+@api.get('/user_by_tg_id/{tg_id: int}')
+@crud.db_session
+def get_user_by_tg_id(tg_id: int):
+    user = crud.get_user_by_tg_id(tg_id)
+    return user
+
+
+@api.post('/create_transaction/{tg_id: int}')
+@crud.db_session
+def create_transaction(tg_id: int, cr_transaction: pydantic_models.CreateTransaction):
+    return crud.create_transaction(
+        sender=get_user_by_tg_id(tg_id),
+        amount_btc_without_fee=cr_transaction.amount_btc_without_fee,
+        reciever_address=cr_transaction.receiver_address
+    )
+
+
 '''
 
 <<<LEARNING>>>

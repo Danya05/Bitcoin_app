@@ -7,7 +7,7 @@ db = Database()
 
 class User(db.Entity):
     id = PrimaryKey(int, auto=True)
-    tg_ID = Required(int)
+    tg_ID = Required(int, unique=True)
     nick = Optional(str)
     create_date = Required(datetime)
     wallet = Required('Wallet')
@@ -38,3 +38,8 @@ class Transaction(db.Entity):
     fee = Required(float)
     date_of_transaction = Required(datetime)
     tx_hash = Required(str, unique=True)
+
+
+class CreateTransaction(db.Entity):
+    receiver_address: Required(str)
+    amount_btc_without_fee: Required(float)
