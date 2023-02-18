@@ -64,20 +64,21 @@ def get_users():
     return users
 
 
-@api.get('/user_by_tg_id/{tg_id: int}')
+@api.get('/user_by_tg_id/{tg_id}')
 @crud.db_session
 def get_user_by_tg_id(tg_id: int):
-    user = crud.get_user_by_tg_id(tg_id)
+    user = crud.get_user_info(crud.User.get(tg_ID=tg_id))
     return user
 
 
-@api.post('/create_transaction/{tg_id: int}')
+@api.post('/create_transaction/{tg_id}')
 @crud.db_session
 def create_transaction(tg_id: int, cr_transaction: pydantic_models.CreateTransaction):
     return crud.create_transaction(
-        sender=get_user_by_tg_id(tg_id),
+        sender=crud.User.get(tg_ID=tg_id),
         amount_btc_without_fee=cr_transaction.amount_btc_without_fee,
-        reciever_address=cr_transaction.receiver_address
+        receiver_address=cr_transaction.receiver_address,
+        testnet=True
     )
 
 

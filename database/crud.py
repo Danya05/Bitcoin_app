@@ -100,7 +100,7 @@ def get_user_by_id(id: int):
 
 @db_session
 def get_user_by_tg_id(tg_id: int):
-    return User.select(u for u in User if u.tg_id == tg_id).first()
+    return User.select(u for u in User if u.tg_ID == tg_id).first()
 
 
 @db_session
